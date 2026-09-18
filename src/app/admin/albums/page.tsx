@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import { requireAdmin } from '@/lib/auth'
 import { createClient } from '@/lib/supabase/server'
 import { AlbumForm } from '@/components/admin/AlbumForm'
+import { NewSingleForm } from '@/components/admin/NewSingleForm'
 import type { Album } from '@/lib/database.types'
 import { albumTypeLabel, releaseYear } from '@/lib/format'
 
@@ -83,6 +84,23 @@ export default async function AdminAlbumsPage() {
               </li>
             ))}
           </ul>
+        )}
+      </section>
+
+      <section className="rounded-card border border-line bg-surface p-5">
+        <h2 className="mb-1 text-lg font-bold text-ink">Release a single</h2>
+        {artistResult.data ? (
+          <>
+            <p className="mb-4 text-sm text-ink-muted">
+              Creates the song and its release together, then opens the lyrics
+              editor.
+            </p>
+            <NewSingleForm />
+          </>
+        ) : (
+          <p className="text-sm text-ink-muted">
+            Create the artist profile first.
+          </p>
         )}
       </section>
 

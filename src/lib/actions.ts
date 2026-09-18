@@ -266,6 +266,69 @@ export async function createAlbum(
   redirect(`/admin/albums/${data.id}`)
 }
 
+/**
+ * Releases a single: one track, and the one-track release that holds it.
+ *
+ * The schema requires every track to belong to an album, which is right for
+ * queries but makes releasing one song a two-step chore. This does both in
+ * one go, titling the release after the track and numbering it 1.
+ *
+ * If the track insert fails the release is deleted again, so a half-finished
+ * single never leaves an empty release sitting in the discography.
+ */
+export async function createSingle(
+  _prev: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  await requireAdmin()
+
+  const title = text(formData, 'title')
+  if (!title) return fail('Title is required.', { title: 'Enter a title.' })
+
+  const supabase = await createClient()
+  const { data: artist } = await supabase
+    .from('artists')
+    .select('id')
+    .order('created_at')
+    .limit(1)
+    .maybeSingle()
+
+  if (!artist) {
+    return fail('Create the artist profile before releasing a single.')
+  }
+
+  const { data: album, error: albumError } = await insertWithSlug(
+    'albums',
+    {
+      artist_id: artist.id,
+      title,
+      album_type: 'single',
+      release_date: text(formData, 'release_date') || null,
+    },
+    slugify(title)
+  )
+
+  if (albumError || !album) {
+    return fail(albumError?.message ?? 'Could not create the single.')
+  }
+
+  const { data: track, error: trackError } = await insertWithSlug(
+    'tracks',
+    { album_id: album.id, title, track_number: 1 },
+    slugify(title)
+  )
+
+  if (trackError || !track) {
+    await supabase.from('albums').delete().eq('id', album.id)
+    return fail(trackError?.message ?? 'Could not create the single.')
+  }
+
+  revalidatePath('/admin/albums')
+  revalidatePath('/admin/tracks')
+  revalidateShared()
+  redirect(`/admin/tracks/${track.id}`)
+}
+
 export async function updateAlbum(
   _prev: ActionState,
   formData: FormData

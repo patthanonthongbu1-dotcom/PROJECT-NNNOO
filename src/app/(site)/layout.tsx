@@ -1,5 +1,11 @@
 import { SiteShell } from '@/components/SiteShell'
+import { SecretEntrance } from '@/components/SecretEntrance'
 
 export default function SiteLayout({ children }: LayoutProps<'/'>) {
-  return <SiteShell>{children}</SiteShell>
+  return (
+    <>
+      <SiteShell>{children}</SiteShell>
+      <SecretEntrance />
+    </>
+  )
 }

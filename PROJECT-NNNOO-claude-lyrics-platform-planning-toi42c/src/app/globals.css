@@ -1,0 +1,70 @@
+@import "tailwindcss";
+
+/*
+ * Dark-first palette. The site only ships a dark theme (like Spotify), so
+ * these are plain values rather than light/dark pairs.
+ */
+@theme {
+  --color-base:      #000000; /* page background                */
+  --color-surface:   #121212; /* cards, sidebar                 */
+  --color-surface-2: #1a1a1a; /* hover state on surfaces        */
+  --color-surface-3: #242424; /* pressed / active               */
+  --color-line:      #2a2a2a; /* hairline borders               */
+
+  --color-ink:       #ffffff; /* primary text                   */
+  --color-ink-muted: #b3b3b3; /* secondary text                 */
+  --color-ink-faint: #6a6a6a; /* tertiary text, metadata        */
+
+  --color-accent:       #1db954; /* brand green                 */
+  --color-accent-hover: #1ed760;
+  --color-highlight:    #3d2f00; /* annotated lyric background  */
+  --color-highlight-ink:#ffd966;
+
+  --radius-card: 0.5rem;
+}
+
+/* `inline` is required for tokens that reference another CSS variable -- here
+   the one next/font generates -- so Tailwind emits the reference, not a copy. */
+@theme inline {
+  --font-sans: var(--font-sans-var), ui-sans-serif, system-ui, sans-serif;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  background-color: var(--color-base);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollbars, so the dark theme doesn't get a bright gutter. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-surface-3) transparent;
+}
+*::-webkit-scrollbar { width: 12px; height: 12px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb {
+  background-color: var(--color-surface-3);
+  border: 3px solid transparent;
+  border-radius: 9999px;
+  background-clip: content-box;
+}
+
+/* Annotated lyrics are spans, not buttons, so that a highlight can flow
+   across a line break. Mobile browsers would otherwise flash their own grey
+   box over one on tap, on top of the colour change the page already makes. */
+[role="button"] {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Respect users who ask for less motion. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

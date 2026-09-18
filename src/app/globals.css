@@ -21,7 +21,11 @@
   --color-highlight-ink:#ffd966;
 
   --radius-card: 0.5rem;
+}
 
+/* `inline` is required for tokens that reference another CSS variable -- here
+   the one next/font generates -- so Tailwind emits the reference, not a copy. */
+@theme inline {
   --font-sans: var(--font-sans-var), ui-sans-serif, system-ui, sans-serif;
 }
 

@@ -15,7 +15,7 @@ browsable publicly, editable only by me.
 
 ## Stack
 
-- **Next.js 15** (App Router) + **TypeScript**
+- **Next.js 16** (App Router) + **TypeScript**
 - **Supabase** — Postgres, Auth (magic link), Storage (cover art)
 - **Tailwind CSS** + **shadcn/ui**
 - **Vercel** for hosting
@@ -79,7 +79,7 @@ avoids a rich-text document model.
 - [ ] Env wiring, deploy an empty shell to Vercel
 
 ### Phase 2 — Admin
-- [ ] Magic-link login, admin route guard via middleware
+- [ ] Magic-link login, admin route guard via `src/proxy.ts` (Next 16 renamed middleware to proxy)
 - [ ] CRUD: artist profile, albums, tracks
 - [ ] Cover art upload to Supabase Storage
 - [ ] Lyrics editor (plain textarea — lyrics are plain text)

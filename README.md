@@ -15,9 +15,11 @@ Next.js 16 (App Router) · TypeScript · Tailwind CSS v4 · Supabase · Vercel
 
 1. Make a project at [supabase.com](https://supabase.com).
 2. Open **SQL Editor** and run [`supabase/migrations/0001_init.sql`](supabase/migrations/0001_init.sql).
-3. Optionally run [`supabase/seed.sql`](supabase/seed.sql) for placeholder rows
+3. Run [`supabase/migrations/0002_storage_and_profiles.sql`](supabase/migrations/0002_storage_and_profiles.sql),
+   which creates the public `media` bucket for cover art and the trigger that
+   gives every new auth user a profile row.
+4. Optionally run [`supabase/seed.sql`](supabase/seed.sql) for placeholder rows
    to click around in.
-4. Under **Storage**, create a public bucket named `media` for cover art.
 
 ### 2. Environment variables
 
@@ -40,8 +42,10 @@ it bypasses RLS entirely.
 
 ### 3. Make yourself the admin
 
-Run the app, go to `/admin`, and sign in with your email. That creates your
-auth user but leaves you without write access. Then in the Supabase SQL editor:
+Run the app, go to `/admin`, and sign in with your email. A trigger creates
+your `profiles` row automatically, but with `is_admin = false` — promotion is
+deliberately manual, so signing in never grants anyone write access by itself.
+In the Supabase SQL editor:
 
 ```sql
 insert into profiles (id, is_admin)

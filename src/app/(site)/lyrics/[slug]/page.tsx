@@ -5,7 +5,7 @@ import { LyricsView } from '@/components/LyricsView'
 import { Prose } from '@/components/Prose'
 import { ViewCounter } from '@/components/ViewCounter'
 import { getAllTrackSlugs, getTrackBySlug } from '@/lib/queries'
-import { formatDuration, formatViews } from '@/lib/format'
+import { formatDate, formatDuration, formatViews } from '@/lib/format'
 import type { Credit, CreditRole } from '@/lib/database.types'
 
 export async function generateStaticParams() {
@@ -77,6 +77,14 @@ export default async function LyricsPage(props: PageProps<'/lyrics/[slug]'>) {
             <Link href={`/album/${album.slug}`} className="hover:underline">
               {album.title}
             </Link>
+            {album.release_date && (
+              <>
+                <span aria-hidden>·</span>
+                <time dateTime={album.release_date}>
+                  {formatDate(album.release_date)}
+                </time>
+              </>
+            )}
             {track.duration_seconds != null && (
               <>
                 <span aria-hidden>·</span>

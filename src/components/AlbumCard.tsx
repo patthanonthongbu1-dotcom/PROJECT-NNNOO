@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import type { Album } from '@/lib/database.types'
-import { albumTypeLabel, releaseYear } from '@/lib/format'
+import { albumTypeLabel, isUpcoming, releaseYear } from '@/lib/format'
 
 export function AlbumCard({ album }: { album: Album }) {
   return (
@@ -38,6 +38,9 @@ export function AlbumCard({ album }: { album: Album }) {
             .filter(Boolean)
             .join(' · ')}
         </p>
+        {isUpcoming(album.release_date) && (
+          <span className="text-xs font-bold text-accent">Upcoming</span>
+        )}
         {album.hidden && (
           <span className="text-xs font-medium text-ink-faint">Hidden</span>
         )}

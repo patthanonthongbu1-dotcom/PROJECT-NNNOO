@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { AlbumCard } from '@/components/AlbumCard'
 import { CoverArt } from '@/components/CoverArt'
+import { Countdown } from '@/components/Countdown'
 import { PopularList } from '@/components/PopularList'
 import {
   getAlbumBySlug,
@@ -10,7 +11,7 @@ import {
   getRecentTracks,
 } from '@/lib/queries'
 import { pickCouplet } from '@/lib/annotations'
-import { albumTypeLabel, formatDate } from '@/lib/format'
+import { albumTypeLabel, formatDate, isUpcoming } from '@/lib/format'
 import type { Album, Track } from '@/lib/database.types'
 
 /** Days since the epoch: the lyric of the day stays put all day (UTC). */
@@ -144,7 +145,8 @@ function LatestRelease({ album }: { album: Album & { tracks: Track[] } }) {
         <CoverArt src={album.cover_url} className="size-40 rounded shadow-2xl sm:size-48" />
         <div className="min-w-0">
           <p className="text-xs font-bold tracking-wide text-ink-muted uppercase">
-            Latest release · {albumTypeLabel(album.album_type)}
+            {isUpcoming(album.release_date) ? 'Coming soon' : 'Latest release'} ·{' '}
+            {albumTypeLabel(album.album_type)}
           </p>
           <h2 className="mt-2 text-3xl font-black break-words text-ink sm:text-5xl">
             {album.title}
@@ -159,6 +161,11 @@ function LatestRelease({ album }: { album: Album & { tracks: Track[] } }) {
           </p>
           {album.description && (
             <p className="mt-3 line-clamp-2 max-w-xl text-ink-muted">{album.description}</p>
+          )}
+          {album.release_date && isUpcoming(album.release_date) && (
+            <div className="mt-5">
+              <Countdown date={album.release_date} />
+            </div>
           )}
           <div className="mt-5 flex flex-wrap gap-3">
             {first && (

@@ -34,3 +34,13 @@ test('pickCouplet skips headers and wraps the seed', async () => {
   assert.deepEqual(pickCouplet(lyrics, 3), ['d', 'e'])
   assert.equal(pickCouplet('[Intro]\n\n', 0), null)
 })
+
+test('timeUntil splits the gap and returns null once released', async () => {
+  const { timeUntil } = await import('./format.ts')
+  const now = Date.parse('2026-10-20T00:00:00Z')
+  assert.deepEqual(timeUntil('2026-10-22', now - 61_000), {
+    days: 2, hours: 0, minutes: 1, seconds: 1,
+  })
+  assert.equal(timeUntil('2026-10-20', now), null)
+  assert.equal(timeUntil('2026-10-19', now), null)
+})

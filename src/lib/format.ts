@@ -21,6 +21,36 @@ export function formatDate(date: string | null): string {
   })
 }
 
+/** A release dated after today (UTC) — shown as "Upcoming". */
+export function isUpcoming(date: string | null): boolean {
+  return date != null && date > new Date().toISOString().slice(0, 10)
+}
+
+/**
+ * Time left until a release date, split for a countdown. Null once it's out.
+ * ponytail: releases drop at 00:00 UTC; add a release_time column if you need local midnight.
+ */
+export function timeUntil(date: string, now: number) {
+  const ms = Date.parse(`${date}T00:00:00Z`) - now
+  if (!(ms > 0)) return null
+  const s = Math.floor(ms / 1000)
+  return {
+    days: Math.floor(s / 86_400),
+    hours: Math.floor(s / 3600) % 24,
+    minutes: Math.floor(s / 60) % 60,
+    seconds: s % 60,
+  }
+}
+
+/** Album length, Spotify-style: "38 min" or "1 hr 4 min". Unknown durations count as 0. */
+export function formatTotalDuration(tracks: { duration_seconds: number | null }[]): string {
+  const minutes = Math.round(
+    tracks.reduce((sum, t) => sum + (t.duration_seconds ?? 0), 0) / 60
+  )
+  if (minutes < 60) return `${minutes} min`
+  return `${Math.floor(minutes / 60)} hr ${minutes % 60} min`
+}
+
 export function formatViews(count: number): string {
   if (count < 1000) return `${count}`
   if (count < 1_000_000) return `${(count / 1000).toFixed(1).replace(/\.0$/, '')}K`

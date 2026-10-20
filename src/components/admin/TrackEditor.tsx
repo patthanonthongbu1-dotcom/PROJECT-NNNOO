@@ -163,6 +163,14 @@ export function TrackEditor({
               defaultChecked={track.published}
             />
 
+            <Checkbox
+              id="early_release"
+              name="early_release"
+              label="Released early as a single"
+              hint="Readable before the album's release date. Other songs stay locked until then."
+              defaultChecked={track.early_release}
+            />
+
             <Field
               label="About"
               htmlFor="about"

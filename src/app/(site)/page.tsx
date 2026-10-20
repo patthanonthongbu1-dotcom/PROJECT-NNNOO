@@ -12,7 +12,7 @@ import {
 } from '@/lib/queries'
 import { pickCouplet } from '@/lib/annotations'
 import { albumTypeLabel, formatDate, isUpcoming } from '@/lib/format'
-import type { Album, Track } from '@/lib/database.types'
+import type { Album, AlbumWithTracks, Track } from '@/lib/database.types'
 
 /** Days since the epoch: the lyric of the day stays put all day (UTC). */
 function dayNumber() {
@@ -127,8 +127,10 @@ export default async function HomePage() {
 }
 
 /** Big featured card for the newest release, cover blurred behind it. */
-function LatestRelease({ album }: { album: Album & { tracks: Track[] } }) {
-  const first = album.tracks[0]
+function LatestRelease({ album }: { album: AlbumWithTracks }) {
+  // Before release only early singles are readable; the rest are locked titles.
+  const first = album.tracks.find((t) => !isUpcoming(album.release_date) || t.early_release)
+  const songs = album.tracks.length + album.locked.length
 
   return (
     <section className="relative overflow-hidden rounded-card bg-surface-2">
@@ -154,7 +156,7 @@ function LatestRelease({ album }: { album: Album & { tracks: Track[] } }) {
           <p className="mt-2 text-sm text-ink-muted">
             {[
               album.release_date && formatDate(album.release_date),
-              `${album.tracks.length} ${album.tracks.length === 1 ? 'song' : 'songs'}`,
+              `${songs} ${songs === 1 ? 'song' : 'songs'}`,
             ]
               .filter(Boolean)
               .join(' · ')}

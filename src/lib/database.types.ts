@@ -50,6 +50,8 @@ export interface Track {
   about: string | null
   view_count: number
   published: boolean
+  /** Readable before its album's release date (a pre-release single). */
+  early_release: boolean
   created_at: string
   updated_at: string
 }
@@ -80,7 +82,9 @@ export interface Profile {
 
 /** Shapes returned by the joined queries used across the app. */
 export type AlbumWithArtist = Album & { artist: Artist }
-export type AlbumWithTracks = Album & { tracks: Track[] }
+/** A track on an upcoming album: title only, lyrics withheld until release. */
+export type LockedTrack = Pick<Track, 'id' | 'title' | 'track_number' | 'duration_seconds'>
+export type AlbumWithTracks = Album & { tracks: Track[]; locked: LockedTrack[] }
 export type TrackWithContext = Track & {
   album: Album & { artist: Artist }
   credits: Credit[]

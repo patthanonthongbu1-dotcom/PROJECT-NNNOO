@@ -489,6 +489,7 @@ export async function updateTrack(
       lyrics: (formData.get('lyrics') as string | null) ?? '',
       about: nullableText(formData, 'about'),
       published: formData.get('published') === 'on',
+      early_release: formData.get('early_release') === 'on',
       updated_at: new Date().toISOString(),
     })
     .eq('id', id)

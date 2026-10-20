@@ -5,6 +5,7 @@ import type {
   Album,
   AlbumWithTracks,
   Artist,
+  LockedTrack,
   Track,
   TrackWithContext,
 } from './database.types'
@@ -78,6 +79,7 @@ export async function getAlbumBySlug(
     if (!album) return null
     return {
       ...album,
+      locked: [],
       tracks: demoData.tracks
         .filter((t) => t.album_id === album.id)
         .sort((a, b) => (a.track_number ?? 0) - (b.track_number ?? 0)),
@@ -95,6 +97,12 @@ export async function getAlbumBySlug(
 
   const album = data as AlbumWithTracks
   album.tracks.sort((a, b) => (a.track_number ?? 0) - (b.track_number ?? 0))
+
+  // Titles of not-yet-released tracks; RLS keeps their rows (and lyrics) out
+  // of `tracks`. An admin already sees them there, so drop the duplicates.
+  const { data: locked } = await supabase.rpc('locked_tracks', { album: album.id })
+  const seen = new Set(album.tracks.map((t) => t.id))
+  album.locked = ((locked ?? []) as LockedTrack[]).filter((t) => !seen.has(t.id))
   return album
 }
 

@@ -36,6 +36,12 @@ export default async function AlbumPage(props: PageProps<'/album/[slug]'>) {
   const [album, artist] = await Promise.all([getAlbumBySlug(slug), getArtist()])
   if (!album) notFound()
 
+  const upcoming = isUpcoming(album.release_date)
+  const rows = [
+    ...album.tracks.map((t) => ({ track: t, locked: upcoming && !t.early_release })),
+    ...album.locked.map((t) => ({ track: t, locked: true })),
+  ].sort((a, b) => (a.track.track_number ?? 0) - (b.track.track_number ?? 0))
+
   return (
     <>
       <PageHeader
@@ -60,10 +66,9 @@ export default async function AlbumPage(props: PageProps<'/album/[slug]'>) {
             )}
             <span aria-hidden>·</span>
             <span>
-              {album.tracks.length}{' '}
-              {album.tracks.length === 1 ? 'song' : 'songs'}
-              {album.tracks.some((t) => t.duration_seconds != null) &&
-                `, ${formatTotalDuration(album.tracks)}`}
+              {rows.length} {rows.length === 1 ? 'song' : 'songs'}
+              {rows.some((r) => r.track.duration_seconds != null) &&
+                `, ${formatTotalDuration(rows.map((r) => r.track))}`}
             </span>
             {isUpcoming(album.release_date) && (
               <span className="rounded-full bg-accent px-2 py-0.5 text-xs font-bold text-black">
@@ -108,12 +113,12 @@ export default async function AlbumPage(props: PageProps<'/album/[slug]'>) {
           </p>
         )}
 
-        {album.tracks.length === 0 ? (
+        {rows.length === 0 ? (
           <p className="text-ink-faint">No songs on this release yet.</p>
         ) : (
           <ol className="flex flex-col">
-            {album.tracks.map((track, i) => (
-              <TrackRow key={track.id} track={track} index={i} />
+            {rows.map(({ track, locked }, i) => (
+              <TrackRow key={track.id} track={track} index={i} locked={locked} />
             ))}
           </ol>
         )}

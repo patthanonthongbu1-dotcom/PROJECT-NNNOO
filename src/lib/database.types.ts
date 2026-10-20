@@ -34,6 +34,8 @@ export interface Album {
   album_type: AlbumType
   genres: string[]
   description: string | null
+  /** Hidden releases (and their tracks) are invisible to everyone but the admin. */
+  hidden: boolean
   created_at: string
 }
 

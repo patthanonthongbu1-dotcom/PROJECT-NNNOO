@@ -91,3 +91,19 @@ export function reanchor(
 export function isSectionHeader(line: string): boolean {
   return /^\s*\[.+\]\s*$/.test(line)
 }
+
+/**
+ * A stanza's opening couplet, chosen by `seed` (e.g. the day number) so the
+ * same lines show all day. Section headers like [Chorus] are skipped.
+ */
+export function pickCouplet(lyrics: string, seed: number): string[] | null {
+  const stanzas = lyrics
+    .replace(/\r\n/g, '\n')
+    .split(/\n\s*\n/)
+    .map((stanza) =>
+      stanza.split('\n').filter((line) => line.trim() && !isSectionHeader(line))
+    )
+    .filter((lines) => lines.length > 0)
+  if (stanzas.length === 0) return null
+  return stanzas[seed % stanzas.length].slice(0, 2)
+}

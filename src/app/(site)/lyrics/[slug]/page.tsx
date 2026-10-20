@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { LyricsView } from '@/components/LyricsView'
+import { Prose } from '@/components/Prose'
 import { ViewCounter } from '@/components/ViewCounter'
 import { getAllTrackSlugs, getTrackBySlug } from '@/lib/queries'
 import { formatDuration, formatViews } from '@/lib/format'
@@ -92,13 +93,28 @@ export default async function LyricsPage(props: PageProps<'/lyrics/[slug]'>) {
         <LyricsView lyrics={track.lyrics} annotations={track.annotations} />
 
         {track.about && (
-          <section className="mt-12 max-w-2xl">
-            <h2 className="mb-3 text-2xl font-bold text-ink">
-              About this song
-            </h2>
-            <p className="leading-relaxed whitespace-pre-wrap text-ink-muted">
-              {track.about}
-            </p>
+          <section className="mt-12 max-w-2xl overflow-hidden rounded-card bg-surface">
+            <div className="flex items-center gap-4 bg-gradient-to-r from-surface-3 to-surface p-5">
+              {album.cover_url && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={album.cover_url}
+                  alt=""
+                  className="size-14 shrink-0 rounded object-cover shadow-lg"
+                />
+              )}
+              <div className="min-w-0">
+                <p className="text-xs font-bold tracking-wide text-ink-muted uppercase">
+                  Behind the song
+                </p>
+                <h2 className="truncate text-2xl font-bold text-ink">
+                  About “{track.title}”
+                </h2>
+              </div>
+            </div>
+            <div className="p-5">
+              <Prose text={track.about} />
+            </div>
           </section>
         )}
 

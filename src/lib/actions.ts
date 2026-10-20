@@ -362,6 +362,37 @@ export async function updateAlbum(
   return ok('Album saved.')
 }
 
+export async function toggleAlbumHidden(
+  _prev: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  await requireAdmin()
+
+  const id = text(formData, 'id')
+  if (!id) return fail('Missing album id.')
+
+  const supabase = await createClient()
+  const { data: album } = await supabase
+    .from('albums')
+    .select('hidden')
+    .eq('id', id)
+    .maybeSingle()
+
+  if (!album) return fail('Album not found.')
+
+  const { error } = await supabase
+    .from('albums')
+    .update({ hidden: !album.hidden })
+    .eq('id', id)
+
+  if (error) return fail(error.message)
+
+  // The album, every lyrics page on it, the artist page and the sidebar on
+  // every page all change, so revalidate the whole tree.
+  revalidatePath('/', 'layout')
+  return ok(album.hidden ? 'Album is visible again.' : 'Album hidden.')
+}
+
 export async function deleteAlbum(
   _prev: ActionState,
   formData: FormData

@@ -75,6 +75,7 @@ export default async function AdminAlbumsPage() {
                         albumTypeLabel(album.album_type),
                         releaseYear(album.release_date),
                         `${counts.get(album.id) ?? 0} tracks`,
+                        album.hidden && 'Hidden',
                       ]
                         .filter(Boolean)
                         .join(' · ')}

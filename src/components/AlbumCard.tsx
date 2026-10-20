@@ -38,6 +38,9 @@ export function AlbumCard({ album }: { album: Album }) {
             .filter(Boolean)
             .join(' · ')}
         </p>
+        {album.hidden && (
+          <span className="text-xs font-medium text-ink-faint">Hidden</span>
+        )}
       </div>
     </Link>
   )

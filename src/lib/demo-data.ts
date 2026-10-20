@@ -35,6 +35,7 @@ const albums: Album[] = [
     genres: ['bedroom pop', 'indie'],
     description:
       'Written across one rainy season, mostly at the kitchen table after everyone had gone to bed.',
+    hidden: false,
     created_at: '2025-03-14T00:00:00Z',
   },
   {
@@ -47,6 +48,7 @@ const albums: Album[] = [
     album_type: 'ep',
     genres: ['lo-fi', 'dream pop'],
     description: 'Four songs about things left plugged in overnight.',
+    hidden: false,
     created_at: '2024-08-02T00:00:00Z',
   },
 ]

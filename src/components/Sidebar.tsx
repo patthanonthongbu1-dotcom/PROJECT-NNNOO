@@ -51,7 +51,11 @@ export function Sidebar({
                       {album.title}
                     </span>
                     <span className="block truncate text-xs text-ink-muted">
-                      {[albumTypeLabel(album.album_type), releaseYear(album.release_date)]
+                      {[
+                        albumTypeLabel(album.album_type),
+                        releaseYear(album.release_date),
+                        album.hidden && 'Hidden',
+                      ]
                         .filter(Boolean)
                         .join(' · ')}
                     </span>

@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { requireAdmin } from '@/lib/auth'
 import { createClient } from '@/lib/supabase/server'
-import { deleteAlbum } from '@/lib/actions'
+import { deleteAlbum, toggleAlbumHidden } from '@/lib/actions'
 import { AlbumForm } from '@/components/admin/AlbumForm'
 import { ActionButton } from '@/components/admin/ActionButton'
 import type { Album, Track } from '@/lib/database.types'
@@ -104,6 +104,22 @@ export default async function AdminAlbumPage({
             ))}
           </ul>
         )}
+      </section>
+
+      <section className="rounded-card border border-line bg-surface p-5">
+        <h2 className="text-lg font-bold text-ink">Visibility</h2>
+        <p className="mt-1 mb-4 text-sm text-ink-muted">
+          {album.hidden
+            ? 'Hidden — this release and its tracks are invisible to everyone but you.'
+            : 'Visible — published tracks on this release are public.'}
+        </p>
+        <ActionButton
+          action={toggleAlbumHidden}
+          fields={{ id: album.id }}
+          pendingLabel="Saving…"
+        >
+          {album.hidden ? 'Unhide album' : 'Hide album'}
+        </ActionButton>
       </section>
 
       <section className="rounded-card border border-red-950 bg-surface p-5">

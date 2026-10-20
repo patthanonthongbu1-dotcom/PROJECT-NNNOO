@@ -166,9 +166,9 @@ export function TrackEditor({
             <Field
               label="About"
               htmlFor="about"
-              hint="The note above the lyrics — context, not commentary on a line."
+              hint="The story behind the song. Blank line = new paragraph; [Heading] on its own line = subheading."
             >
-              <TextArea id="about" name="about" rows={4} defaultValue={track.about ?? ''} />
+              <TextArea id="about" name="about" rows={12} defaultValue={track.about ?? ''} />
             </Field>
           </div>
         </Panel>

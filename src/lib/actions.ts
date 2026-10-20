@@ -81,7 +81,7 @@ function parseGenres(raw: string): string[] {
 function slugify(input: string): string {
   return input
     .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[̀-ͯ]/g, '')
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/-{2,}/g, '-')
@@ -729,7 +729,9 @@ export async function reanchorAnnotation(
 
 // ------------------------------------------------------------------ uploads
 
-const MAX_UPLOAD_BYTES = 5 * 1024 * 1024
+// Leaves room for multipart overhead under the 4.5mb bodySizeLimit in
+// next.config.ts, which is itself pinned to Vercel's request cap.
+const MAX_UPLOAD_BYTES = 4 * 1024 * 1024
 
 /**
  * Puts an image in the public `media` bucket and hands back its URL, which
@@ -749,7 +751,7 @@ export async function uploadImage(
     return { status: 'error', message: 'That file is not an image.' }
   }
   if (file.size > MAX_UPLOAD_BYTES) {
-    return { status: 'error', message: 'Images must be under 5 MB.' }
+    return { status: 'error', message: 'Images must be under 4 MB.' }
   }
 
   const folder = text(formData, 'folder') || 'covers'

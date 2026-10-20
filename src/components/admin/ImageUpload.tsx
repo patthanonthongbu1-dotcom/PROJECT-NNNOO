@@ -35,17 +35,29 @@ export function ImageUpload({
     if (!file) return
     setError('')
 
+    // Checked here too: an oversized body is rejected by Next before the
+    // action runs, so the action's own size message would never arrive.
+    if (file.size > 4 * 1024 * 1024) {
+      setError('Images must be under 4 MB.')
+      return
+    }
+
     const formData = new FormData()
     formData.append('file', file)
     formData.append('folder', folder)
 
     startTransition(async () => {
-      const result = await uploadImage({ status: 'idle' }, formData)
-      if (result.status === 'error' || !result.url) {
-        setError(result.message ?? 'Upload failed.')
-        return
+      try {
+        const result = await uploadImage({ status: 'idle' }, formData)
+        if (result.status === 'error' || !result.url) {
+          setError(result.message ?? 'Upload failed.')
+          return
+        }
+        setUrl(result.url)
+      } catch {
+        // Network failures and framework rejections throw rather than return.
+        setError('Upload failed. Try a smaller image.')
       }
-      setUrl(result.url)
     })
   }
 

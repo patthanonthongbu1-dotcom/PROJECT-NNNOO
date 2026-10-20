@@ -173,7 +173,7 @@ export function TrackEditor({
                 hint="Readable before the album's release date. Other songs stay locked until then."
                 defaultChecked={track.early_release}
               />
-              <div className="hidden group-has-[#early_release:checked]/single:block">
+              <div className="hidden group-has-checked/single:block">
                 <ImageUpload
                   name="cover_url"
                   label="Single cover art"

@@ -17,6 +17,7 @@ import {
   TextArea,
   TextInput,
 } from './FormControls'
+import { ImageUpload } from './ImageUpload'
 
 /**
  * The lyrics editor and everything hanging off it.
@@ -163,13 +164,25 @@ export function TrackEditor({
               defaultChecked={track.published}
             />
 
-            <Checkbox
-              id="early_release"
-              name="early_release"
-              label="Released early as a single"
-              hint="Readable before the album's release date. Other songs stay locked until then."
-              defaultChecked={track.early_release}
-            />
+            {/* The cover field only shows while the single box is ticked: CSS, no state. */}
+            <div className="group/single flex flex-col gap-6">
+              <Checkbox
+                id="early_release"
+                name="early_release"
+                label="Released early as a single"
+                hint="Readable before the album's release date. Other songs stay locked until then."
+                defaultChecked={track.early_release}
+              />
+              <div className="hidden group-has-[#early_release:checked]/single:block">
+                <ImageUpload
+                  name="cover_url"
+                  label="Single cover art"
+                  folder="covers"
+                  defaultValue={track.cover_url}
+                  hint="Square. Leave empty to use the album cover."
+                />
+              </div>
+            </div>
 
             <Field
               label="About"

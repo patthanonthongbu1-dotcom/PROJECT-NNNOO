@@ -52,6 +52,8 @@ export interface Track {
   published: boolean
   /** Readable before its album's release date (a pre-release single). */
   early_release: boolean
+  /** Single cover; falls back to the album cover when null. */
+  cover_url: string | null
   created_at: string
   updated_at: string
 }

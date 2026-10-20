@@ -188,6 +188,7 @@ const tracks: Track[] = trackSeed.map((t, i) => ({
   view_count: t.views,
   published: true,
   early_release: false,
+  cover_url: null,
   created_at: `2025-0${i + 1}-01T00:00:00Z`,
   updated_at: `2025-0${i + 1}-01T00:00:00Z`,
 }))

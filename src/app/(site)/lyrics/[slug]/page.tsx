@@ -35,16 +35,17 @@ export default async function LyricsPage(props: PageProps<'/lyrics/[slug]'>) {
 
   const { album } = track
   const { artist } = album
+  const cover = track.cover_url ?? album.cover_url
 
   return (
     <article>
       <ViewCounter slug={track.slug} />
 
       <header className="flex flex-col gap-6 bg-gradient-to-b from-surface-3 to-transparent p-6 pt-12 sm:flex-row sm:items-end sm:p-8">
-        {album.cover_url ? (
+        {cover ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={album.cover_url}
+            src={cover}
             alt=""
             className="size-40 shrink-0 rounded object-cover shadow-2xl"
           />
@@ -103,10 +104,10 @@ export default async function LyricsPage(props: PageProps<'/lyrics/[slug]'>) {
         {track.about && (
           <section className="mt-12 max-w-2xl overflow-hidden rounded-card bg-surface">
             <div className="flex items-center gap-4 bg-gradient-to-r from-surface-3 to-surface p-5">
-              {album.cover_url && (
+              {cover && (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
-                  src={album.cover_url}
+                  src={cover}
                   alt=""
                   className="size-14 shrink-0 rounded object-cover shadow-lg"
                 />

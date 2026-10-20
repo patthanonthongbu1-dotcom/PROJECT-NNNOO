@@ -490,6 +490,7 @@ export async function updateTrack(
       about: nullableText(formData, 'about'),
       published: formData.get('published') === 'on',
       early_release: formData.get('early_release') === 'on',
+      cover_url: nullableText(formData, 'cover_url'),
       updated_at: new Date().toISOString(),
     })
     .eq('id', id)

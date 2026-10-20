@@ -197,7 +197,7 @@ function TrackCard({ track, album }: { track: Track; album?: Album }) {
       href={`/lyrics/${track.slug}`}
       className="flex w-40 shrink-0 snap-start flex-col gap-3 rounded-card p-3 transition-colors hover:bg-surface-2 sm:w-44"
     >
-      <CoverArt src={album?.cover_url} className="aspect-square w-full rounded shadow-lg" />
+      <CoverArt src={track.cover_url ?? album?.cover_url} className="aspect-square w-full rounded shadow-lg" />
       <span className="min-w-0">
         <span className="block truncate font-bold text-ink">{track.title}</span>
         {album && (

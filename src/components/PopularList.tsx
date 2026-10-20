@@ -27,7 +27,7 @@ export function PopularList({
               <span className="text-right tabular-nums text-ink-faint">
                 {i + 1}
               </span>
-              <CoverArt src={album?.cover_url} className="size-10 rounded" />
+              <CoverArt src={track.cover_url ?? album?.cover_url} className="size-10 rounded" />
               <span className="min-w-0">
                 <span className="block truncate font-medium text-ink">
                   {track.title}

@@ -4,6 +4,8 @@ import type { Metadata } from 'next'
 import { LyricsView } from '@/components/LyricsView'
 import { Prose } from '@/components/Prose'
 import { ViewCounter } from '@/components/ViewCounter'
+import { MerchCard } from '@/components/MerchCard'
+import { getMerchForAlbum } from '@/lib/merch'
 import { getAllTrackSlugs, getTrackBySlug } from '@/lib/queries'
 import { formatDate, formatDuration, formatViews } from '@/lib/format'
 import type { Credit, CreditRole } from '@/lib/database.types'
@@ -36,6 +38,7 @@ export default async function LyricsPage(props: PageProps<'/lyrics/[slug]'>) {
   const { album } = track
   const { artist } = album
   const cover = track.cover_url ?? album.cover_url
+  const eraMerch = getMerchForAlbum(album.slug)[0]
 
   return (
     <article>
@@ -128,6 +131,14 @@ export default async function LyricsPage(props: PageProps<'/lyrics/[slug]'>) {
         )}
 
         {track.credits.length > 0 && <Credits credits={track.credits} />}
+
+        {/* Matched by album, and always after the lyrics. One card max. */}
+        {eraMerch && (
+          <section className="mt-12 max-w-2xl">
+            <h2 className="mb-2 text-2xl font-bold text-ink">Merch from this era</h2>
+            <MerchCard item={eraMerch} size="small" />
+          </section>
+        )}
       </div>
     </article>
   )

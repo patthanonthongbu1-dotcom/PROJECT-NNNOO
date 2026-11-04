@@ -3,6 +3,8 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import { SearchBox } from '@/components/SearchBox'
 import { searchTracks } from '@/lib/queries'
+import { searchMerch } from '@/lib/merch'
+import { MerchCard } from '@/components/MerchCard'
 import type { Track } from '@/lib/database.types'
 
 export const metadata: Metadata = {
@@ -18,7 +20,12 @@ export default async function SearchPage(props: PageProps<'/search'>) {
   // `?q=a&q=b` arrives as an array; the last one is what the box last wrote.
   const query = (Array.isArray(q) ? q.at(-1) : q)?.trim() ?? ''
 
-  const tracks = query ? await searchTracks(query) : []
+  const type = (await props.searchParams).type
+  const filter = type === 'merch' || type === 'lyrics' ? type : 'all'
+
+  const tracks = query && filter !== 'merch' ? await searchTracks(query) : []
+  const merch = filter !== 'lyrics' ? searchMerch(query) : []
+  const total = tracks.length + merch.length
   const matcher = buildMatcher(query)
 
   return (
@@ -30,18 +37,44 @@ export default async function SearchPage(props: PageProps<'/search'>) {
         <SearchBox />
       </Suspense>
 
-      <p aria-live="polite" className="mt-4 min-h-5 text-sm text-ink-faint">
-        {query
-          ? `${tracks.length} ${tracks.length === 1 ? 'result' : 'results'} for “${query}”`
-          : ''}
+      {query && (
+        <nav aria-label="Filter results" className="mt-4 flex flex-wrap gap-2">
+          {(['all', 'lyrics', 'merch'] as const).map((f) => (
+            <Link
+              key={f}
+              href={`/search?q=${encodeURIComponent(query)}${f === 'all' ? '' : `&type=${f}`}`}
+              scroll={false}
+              aria-current={f === filter ? 'page' : undefined}
+              className={`flex min-h-11 items-center rounded-full px-4 text-sm font-medium capitalize transition-colors ${
+                f === filter ? 'bg-ink text-black' : 'bg-surface-2 text-ink hover:bg-surface-3'
+              }`}
+            >
+              {f}
+            </Link>
+          ))}
+        </nav>
+      )}
+
+      <p aria-live="polite" className="mt-4 min-h-5 text-sm text-ink-muted">
+        {query ? `${total} ${total === 1 ? 'result' : 'results'} for “${query}”` : ''}
       </p>
 
       {!query ? (
         <Prompt />
-      ) : tracks.length === 0 ? (
+      ) : total === 0 ? (
         <NoResults query={query} />
       ) : (
         <ul className="mt-4 flex flex-col gap-1">
+          {merch.map((item) => (
+            <li key={item.slug} className="flex items-center gap-2">
+              <div className="min-w-0 flex-1">
+                <MerchCard item={item} size="small" />
+              </div>
+              <span className="shrink-0 rounded-full bg-merch-pink px-2 py-0.5 text-xs font-bold text-black">
+                Merch
+              </span>
+            </li>
+          ))}
           {tracks.map((track) => (
             <Result key={track.id} track={track} matcher={matcher} />
           ))}

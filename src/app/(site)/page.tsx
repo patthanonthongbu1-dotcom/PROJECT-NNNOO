@@ -11,6 +11,8 @@ import {
   getRecentTracks,
 } from '@/lib/queries'
 import { pickCouplet } from '@/lib/annotations'
+import { MERCH, getLatestDrop } from '@/lib/merch'
+import { MerchCard, MerchRow } from '@/components/MerchCard'
 import { albumTypeLabel, formatDate, isUpcoming } from '@/lib/format'
 import type { Album, AlbumWithTracks, Track } from '@/lib/database.types'
 
@@ -38,6 +40,10 @@ export default async function HomePage() {
     .filter((t) => t.lyrics.trim())
   const lyricTrack = pool.length > 0 ? pool[day % pool.length] : null
   const couplet = lyricTrack ? pickCouplet(lyricTrack.lyrics, day) : null
+
+  // A locked item with a future drop date beats the latest drop (countdown).
+  const drop =
+    MERCH.find((m) => m.status === 'locked' && isUpcoming(m.dropDate)) ?? getLatestDrop()
 
   return (
     <div className="flex flex-col gap-12 p-6 sm:p-8">
@@ -89,6 +95,8 @@ export default async function HomePage() {
         </div>
       )}
 
+      {drop && <MerchCard item={drop} size="banner" />}
+
       {recent.length > 0 && (
         <Section title="Latest lyrics">
           <Shelf>
@@ -122,6 +130,8 @@ export default async function HomePage() {
           </div>
         </Section>
       )}
+
+      <MerchRow title="Merch" items={MERCH.filter((m) => m !== drop)} showAll />
     </div>
   )
 }

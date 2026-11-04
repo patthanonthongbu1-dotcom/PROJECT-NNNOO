@@ -5,6 +5,8 @@ import { AlbumCard } from '@/components/AlbumCard'
 import { PageHeader } from '@/components/PageHeader'
 import { PopularList } from '@/components/PopularList'
 import { Prose } from '@/components/Prose'
+import { MerchRow } from '@/components/MerchCard'
+import { MERCH } from '@/lib/merch'
 import { getAlbums, getArtistBySlug, getPopularTracks } from '@/lib/queries'
 import { groupByYear } from '@/lib/format'
 import type { Album, Artist } from '@/lib/database.types'
@@ -112,6 +114,8 @@ export default async function ArtistPage(props: PageProps<'/artist/[slug]'>) {
             </ol>
           )}
         </section>
+
+        <MerchRow title="Merch" items={MERCH} showAll />
 
         {artist.bio && (
           <section className="max-w-3xl">

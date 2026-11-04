@@ -21,6 +21,18 @@
   --color-highlight-ink:#ffd966;
 
   --radius-card: 0.5rem;
+
+  /* Merch section: a white theme of its own (/merch pages only). */
+  --color-merch-bg:        #ffffff;
+  --color-merch-surface:   #f5f5f5;
+  --color-merch-ink:       #121212;
+  --color-merch-muted:     #595959; /* 7:1 on white, 6.3:1 on surface */
+  --color-merch-pink:      #f48fb1; /* NEW tag, lyrics card           */
+  --color-merch-pink-ink:  #c2185b; /* pink text on light backgrounds */
+  --color-merch-tint-pink: #fbe3ec;
+  --color-merch-tint-blue: #e3ebf8;
+  --color-merch-locked:    #1e1e1e;
+  --radius-merch: 12px;
 }
 
 /* `inline` is required for tokens that reference another CSS variable -- here

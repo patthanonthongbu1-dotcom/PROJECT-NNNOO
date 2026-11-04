@@ -4,6 +4,8 @@ import type { Metadata } from 'next'
 import { PageHeader } from '@/components/PageHeader'
 import { TrackRow } from '@/components/TrackRow'
 import { Countdown } from '@/components/Countdown'
+import { MerchRow } from '@/components/MerchCard'
+import { getMerchForAlbum } from '@/lib/merch'
 import { getAlbumBySlug, getAllAlbumSlugs, getArtist } from '@/lib/queries'
 import {
   albumTypeLabel,
@@ -122,6 +124,10 @@ export default async function AlbumPage(props: PageProps<'/album/[slug]'>) {
             ))}
           </ol>
         )}
+
+        <div className="mt-10">
+          <MerchRow title="Merch for this album" items={getMerchForAlbum(album.slug)} />
+        </div>
 
         {album.release_date && (
           <p className="mt-8 text-sm text-ink-muted">

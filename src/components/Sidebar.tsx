@@ -26,6 +26,7 @@ export function Sidebar({
               icon={<ArtistIcon />}
             />
           )}
+          <NavLink href="/merch" label="Merch" icon={<MerchIcon />} />
         </ul>
       </div>
 
@@ -139,6 +140,14 @@ function ArtistIcon() {
   return (
     <svg viewBox="0 0 24 24" className="size-6 fill-current">
       <path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm0 2c-4 0-7 2-7 4.5V21h14v-2.5C19 16 16 14 12 14Z" />
+    </svg>
+  )
+}
+
+function MerchIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="size-6 fill-none stroke-current stroke-2">
+      <path d="M7 3h10v18l-5-4-5 4V3Z" strokeLinejoin="round" />
     </svg>
   )
 }

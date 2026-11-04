@@ -6,7 +6,7 @@ import { TrackRow } from '@/components/TrackRow'
 import { Countdown } from '@/components/Countdown'
 import { MerchRow } from '@/components/MerchCard'
 import { getMerchForAlbum } from '@/lib/merch'
-import { getAlbumBySlug, getAllAlbumSlugs, getArtist } from '@/lib/queries'
+import { getAlbumBySlug, getAllAlbumSlugs, getArtist, getMerch } from '@/lib/queries'
 import {
   albumTypeLabel,
   formatDate,
@@ -35,7 +35,7 @@ export async function generateMetadata(
 
 export default async function AlbumPage(props: PageProps<'/album/[slug]'>) {
   const { slug } = await props.params
-  const [album, artist] = await Promise.all([getAlbumBySlug(slug), getArtist()])
+  const [album, artist, merch] = await Promise.all([getAlbumBySlug(slug), getArtist(), getMerch()])
   if (!album) notFound()
 
   const upcoming = isUpcoming(album.release_date)
@@ -126,7 +126,7 @@ export default async function AlbumPage(props: PageProps<'/album/[slug]'>) {
         )}
 
         <div className="mt-10">
-          <MerchRow title="Merch for this album" items={getMerchForAlbum(album.slug)} />
+          <MerchRow title="Merch for this album" items={getMerchForAlbum(album.slug, merch)} />
         </div>
 
         {album.release_date && (

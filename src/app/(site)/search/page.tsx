@@ -2,7 +2,7 @@ import { Suspense } from 'react'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { SearchBox } from '@/components/SearchBox'
-import { searchTracks } from '@/lib/queries'
+import { getMerch, searchTracks } from '@/lib/queries'
 import { searchMerch } from '@/lib/merch'
 import { MerchCard } from '@/components/MerchCard'
 import type { Track } from '@/lib/database.types'
@@ -24,7 +24,7 @@ export default async function SearchPage(props: PageProps<'/search'>) {
   const filter = type === 'merch' || type === 'lyrics' ? type : 'all'
 
   const tracks = query && filter !== 'merch' ? await searchTracks(query) : []
-  const merch = filter !== 'lyrics' ? searchMerch(query) : []
+  const merch = filter !== 'lyrics' ? searchMerch(query, await getMerch()) : []
   const total = tracks.length + merch.length
   const matcher = buildMatcher(query)
 

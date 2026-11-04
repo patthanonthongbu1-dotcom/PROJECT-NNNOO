@@ -108,7 +108,7 @@ function isTrackNumberCollision(error: { code?: string; message?: string } | nul
  * the admin typed are reported back instead (see the update actions).
  */
 async function insertWithSlug(
-  table: 'albums' | 'tracks',
+  table: 'albums' | 'tracks' | 'merch',
   row: Record<string, unknown>,
   baseSlug: string
 ) {
@@ -725,6 +725,136 @@ export async function reanchorAnnotation(
 
   await revalidateTrack(trackId)
   return ok('Annotation re-anchored.')
+}
+
+// ------------------------------------------------------------------- merch
+
+const HEX_COLOR = /^#[0-9a-f]{6}$/i
+
+/**
+ * Reads the merch form. Photos arrive as parallel lists (photo_src[i],
+ * photo_alt[i], photo_label[i]), one entry per photo row, in display order.
+ */
+function merchFields(formData: FormData) {
+  const all = (key: string) => formData.getAll(key).map((v) => (typeof v === 'string' ? v.trim() : ''))
+  const alts = all('photo_alt')
+  const labels = all('photo_label')
+  const photos = all('photo_src')
+    .map((src, i) => ({ src, alt: alts[i] ?? '', label: labels[i] ?? '' }))
+    .filter((photo) => photo.src)
+
+  return {
+    name: text(formData, 'name'),
+    type: text(formData, 'type'),
+    status: text(formData, 'status'),
+    drop_date: nullableText(formData, 'drop_date'),
+    album_id: nullableText(formData, 'album_id'),
+    size: text(formData, 'size'),
+    finish: text(formData, 'finish'),
+    printed_by: text(formData, 'printed_by'),
+    released: text(formData, 'released'),
+    edition: text(formData, 'edition'),
+    header_tint: text(formData, 'header_tint'),
+    art_bg: text(formData, 'art_bg'),
+    photos,
+    is_latest_drop: formData.get('is_latest_drop') === 'on',
+  }
+}
+
+function checkMerch(fields: ReturnType<typeof merchFields>): ActionState | null {
+  if (!fields.name) return fail('Name is required.', { name: 'Enter a name.' })
+  if (!['bookmark', 'standee'].includes(fields.type)) return fail('Pick a type.')
+  if (!['collected', 'locked'].includes(fields.status)) return fail('Pick a status.')
+  if (!HEX_COLOR.test(fields.header_tint) || !HEX_COLOR.test(fields.art_bg)) {
+    return fail('Colors must look like #F48FB1.')
+  }
+  for (const photo of fields.photos) {
+    if (!/^(https:\/\/|\/)/.test(photo.src)) return fail('Photo links must start with https:// or /.')
+    // Screen readers read this out; a photo without it is invisible to them.
+    if (!photo.alt) return fail('Every photo needs a description (alt text).')
+  }
+  return null
+}
+
+/** Only one item can be the latest drop; clear the flag everywhere else first. */
+async function clearOtherLatestDrops(keepId?: string) {
+  const supabase = await createClient()
+  let query = supabase.from('merch').update({ is_latest_drop: false }).eq('is_latest_drop', true)
+  if (keepId) query = query.neq('id', keepId)
+  return query
+}
+
+export async function createMerch(
+  _prev: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  await requireAdmin()
+
+  const fields = merchFields(formData)
+  const problem = checkMerch(fields)
+  if (problem) return problem
+
+  if (fields.is_latest_drop) {
+    const { error } = await clearOtherLatestDrops()
+    if (error) return fail(error.message)
+  }
+
+  const { data, error } = await insertWithSlug('merch', fields, slugify(fields.name))
+  if (error || !data) return fail(error?.message ?? 'Could not create the item.')
+
+  // Merch shows on home, album, lyrics, artist, search and /merch pages.
+  revalidatePath('/', 'layout')
+  redirect(`/admin/merch/${data.id}`)
+}
+
+export async function updateMerch(
+  _prev: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  await requireAdmin()
+
+  const id = text(formData, 'id')
+  if (!id) return fail('Missing item id.')
+
+  const fields = merchFields(formData)
+  const problem = checkMerch(fields)
+  if (problem) return problem
+
+  if (fields.is_latest_drop) {
+    const { error } = await clearOtherLatestDrops(id)
+    if (error) return fail(error.message)
+  }
+
+  const slug = text(formData, 'slug') || slugify(fields.name)
+  const supabase = await createClient()
+  const { error } = await supabase.from('merch').update({ ...fields, slug }).eq('id', id)
+
+  if (error) {
+    if (isSlugCollision(error)) {
+      return fail('That URL slug is taken.', { slug: 'Already in use.' })
+    }
+    return fail(error.message)
+  }
+
+  revalidatePath('/', 'layout')
+  return ok('Merch saved.')
+}
+
+export async function deleteMerch(
+  _prev: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  await requireAdmin()
+
+  const id = text(formData, 'id')
+  if (!id) return fail('Missing item id.')
+
+  const supabase = await createClient()
+  const { error } = await supabase.from('merch').delete().eq('id', id)
+  if (error) return fail(error.message)
+
+  revalidatePath('/', 'layout')
+  redirect('/admin/merch')
 }
 
 // ------------------------------------------------------------------ uploads

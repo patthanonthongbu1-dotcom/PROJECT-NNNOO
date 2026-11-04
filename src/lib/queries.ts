@@ -1,6 +1,7 @@
 import { createClient } from './supabase/server'
 import { createStaticClient } from './supabase/static'
 import { demoData } from './demo-data'
+import { DEMO_MERCH, merchFromRow, type MerchItem, type MerchRow } from './merch'
 import type {
   Album,
   AlbumWithTracks,
@@ -223,6 +224,26 @@ export async function searchTracks(query: string): Promise<Track[]> {
     })
     .limit(50)
   return data ?? []
+}
+
+/** All merch, oldest first (the order /admin/merch lists them in). */
+export async function getMerch(): Promise<MerchItem[]> {
+  if (!isDatabaseConfigured) return DEMO_MERCH
+
+  const supabase = await createClient()
+  const { data } = await supabase
+    .from('merch')
+    .select('*, album:albums(slug)')
+    .order('created_at')
+  return ((data ?? []) as MerchRow[]).map(merchFromRow)
+}
+
+export async function getAllMerchSlugs(): Promise<string[]> {
+  if (!isDatabaseConfigured) return DEMO_MERCH.map((m) => m.slug)
+
+  const supabase = createStaticClient()
+  const { data } = await supabase.from('merch').select('slug')
+  return (data ?? []).map((row) => row.slug as string)
 }
 
 /** Fire-and-forget counter bump; never blocks or fails a page render. */

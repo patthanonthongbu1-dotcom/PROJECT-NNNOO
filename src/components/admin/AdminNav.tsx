@@ -8,6 +8,7 @@ const LINKS = [
   { href: '/admin/artist', label: 'Artist' },
   { href: '/admin/albums', label: 'Albums' },
   { href: '/admin/tracks', label: 'Tracks' },
+  { href: '/admin/merch', label: 'Merch' },
 ] as const
 
 /** Top rail of the admin chrome, styled like the site's sidebar nav. */

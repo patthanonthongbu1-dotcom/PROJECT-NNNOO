@@ -8,10 +8,11 @@ import {
   getAlbums,
   getArtist,
   getPopularTracks,
+  getMerch,
   getRecentTracks,
 } from '@/lib/queries'
 import { pickCouplet } from '@/lib/annotations'
-import { MERCH, getLatestDrop } from '@/lib/merch'
+import { getLatestDrop } from '@/lib/merch'
 import { MerchCard, MerchRow } from '@/components/MerchCard'
 import { albumTypeLabel, formatDate, isUpcoming } from '@/lib/format'
 import type { Album, AlbumWithTracks, Track } from '@/lib/database.types'
@@ -22,11 +23,12 @@ function dayNumber() {
 }
 
 export default async function HomePage() {
-  const [artist, albums, recent, popular] = await Promise.all([
+  const [artist, albums, recent, popular, merch] = await Promise.all([
     getArtist(),
     getAlbums(),
     getRecentTracks(10),
     getPopularTracks(5),
+    getMerch(),
   ])
 
   if (!artist) return <EmptyState />
@@ -43,7 +45,7 @@ export default async function HomePage() {
 
   // A locked item with a future drop date beats the latest drop (countdown).
   const drop =
-    MERCH.find((m) => m.status === 'locked' && isUpcoming(m.dropDate)) ?? getLatestDrop()
+    merch.find((m) => m.status === 'locked' && isUpcoming(m.dropDate)) ?? getLatestDrop(merch)
 
   return (
     <div className="flex flex-col gap-12 p-6 sm:p-8">
@@ -131,7 +133,7 @@ export default async function HomePage() {
         </Section>
       )}
 
-      <MerchRow title="Merch" items={MERCH.filter((m) => m !== drop)} showAll />
+      <MerchRow title="Merch" items={merch.filter((m) => m !== drop)} showAll />
     </div>
   )
 }

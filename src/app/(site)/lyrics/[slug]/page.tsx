@@ -6,7 +6,7 @@ import { Prose } from '@/components/Prose'
 import { ViewCounter } from '@/components/ViewCounter'
 import { MerchCard } from '@/components/MerchCard'
 import { getMerchForAlbum } from '@/lib/merch'
-import { getAllTrackSlugs, getTrackBySlug } from '@/lib/queries'
+import { getAllTrackSlugs, getMerch, getTrackBySlug } from '@/lib/queries'
 import { formatDate, formatDuration, formatViews } from '@/lib/format'
 import type { Credit, CreditRole } from '@/lib/database.types'
 
@@ -38,7 +38,7 @@ export default async function LyricsPage(props: PageProps<'/lyrics/[slug]'>) {
   const { album } = track
   const { artist } = album
   const cover = track.cover_url ?? album.cover_url
-  const eraMerch = getMerchForAlbum(album.slug)[0]
+  const eraMerch = getMerchForAlbum(album.slug, await getMerch())[0]
 
   return (
     <article>

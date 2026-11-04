@@ -2,8 +2,8 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import { CoverArt } from '@/components/CoverArt'
 import { LockIcon, MerchArt, merchMeta } from '@/components/MerchCard'
-import { getAlbums } from '@/lib/queries'
-import { MERCH, getLatestDrop, getMerchForAlbum, getMoreMerch, type MerchItem } from '@/lib/merch'
+import { getAlbums, getMerch } from '@/lib/queries'
+import { getLatestDrop, getMerchForAlbum, getMoreMerch, type MerchItem } from '@/lib/merch'
 
 export const metadata: Metadata = {
   title: 'Merch',
@@ -22,13 +22,14 @@ export default async function MerchPage(props: PageProps<'/merch'>) {
   const filter = FILTERS.find((f) => f.value === type) ?? FILTERS[0]
   const isAll = filter.value === 'all'
 
-  const latest = getLatestDrop()
+  const MERCH = await getMerch()
+  const latest = getLatestDrop(MERCH)
   // On "All" the latest drop has its own card, so the grid skips it.
-  const grid = (isAll ? getMoreMerch() : MERCH).filter(filter.match)
+  const grid = (isAll ? getMoreMerch(MERCH) : MERCH).filter(filter.match)
   const locked = MERCH.filter((m) => m.status === 'locked').length
 
   const albums = (await getAlbums())
-    .map((album) => ({ album, count: getMerchForAlbum(album.slug).length }))
+    .map((album) => ({ album, count: getMerchForAlbum(album.slug, MERCH).length }))
     .filter((row) => row.count > 0)
 
   return (
@@ -50,7 +51,7 @@ export default async function MerchPage(props: PageProps<'/merch'>) {
             className="grid size-40 shrink-0 grid-cols-2 overflow-hidden rounded-merch shadow-xl sm:size-48"
           >
             {[0, 1, 2, 3].map((i) => (
-              <span key={i} style={{ backgroundColor: MERCH[i % MERCH.length].colors.artBg }} />
+              <span key={i} style={{ backgroundColor: MERCH[i % MERCH.length]?.colors.artBg }} />
             ))}
           </div>
           <div className="min-w-0">
@@ -106,6 +107,7 @@ export default async function MerchPage(props: PageProps<'/merch'>) {
           </Link>
         )}
 
+        {!(isAll && grid.length === 0) && (
         <section>
           <h2 className="mb-4 text-xl font-extrabold">{isAll ? 'More merch' : filter.label}</h2>
           {grid.length === 0 ? (
@@ -120,6 +122,7 @@ export default async function MerchPage(props: PageProps<'/merch'>) {
             </ul>
           )}
         </section>
+        )}
 
         {albums.length > 0 && (
           <section>
